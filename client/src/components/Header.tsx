@@ -192,33 +192,44 @@ export function Header({ onSearch, onShowDonation }: HeaderProps) {
             </div>
           </div>
 
-          {/* Navigation Menu */}
-          <nav className="border-t py-2" style={{ borderColor: 'var(--bg-secondary)' }}>
+          {/* Navigation Menu with Dividers */}
+          <nav className="border-t py-2 relative" style={{ borderColor: 'var(--bg-secondary)' }}>
+            {/* Moving RGB line for cool theme */}
+            <div className="moving-rgb-line"></div>
+            
             <div className="flex items-center space-x-8">
               <Link href="/categories" className="text-sm hover:text-accent theme-transition">
                 All Categories
               </Link>
+              <div className="category-divider"></div>
               <Link href="/electronics" className="text-sm hover:text-accent theme-transition">
                 Electronics
               </Link>
+              <div className="category-divider"></div>
               <Link href="/fashion" className="text-sm hover:text-accent theme-transition">
                 Fashion
               </Link>
+              <div className="category-divider"></div>
               <Link href="/home" className="text-sm hover:text-accent theme-transition">
                 Home & Garden
               </Link>
+              <div className="category-divider"></div>
               <Link href="/sports" className="text-sm hover:text-accent theme-transition">
                 Sports
               </Link>
+              <div className="category-divider"></div>
               <Link href="/books" className="text-sm hover:text-accent theme-transition">
                 Books
               </Link>
+              <div className="category-divider"></div>
               <Link href="/about" className="text-sm hover:text-accent theme-transition">
                 About Us
               </Link>
+              <div className="category-divider"></div>
               <Link href="/contact" className="text-sm hover:text-accent theme-transition">
                 Contact
               </Link>
+              <div className="category-divider"></div>
               <Button
                 onClick={onShowDonation}
                 variant="ghost"
