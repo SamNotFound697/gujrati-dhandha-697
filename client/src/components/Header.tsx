@@ -59,7 +59,7 @@ export function Header({ onSearch, onShowDonation }: HeaderProps) {
             <Link href="/">
               <div className="flex items-center space-x-2 text-2xl font-bold" style={{ color: 'var(--accent)' }}>
                 <Store className="h-6 w-6" />
-                <span>MarketPlace Pro</span>
+                <span>Gujrati Dhandha</span>
               </div>
             </Link>
 

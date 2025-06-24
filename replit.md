@@ -1,4 +1,4 @@
-# E-Commerce Platform
+# E-Commerce Platform - Gujrati Dhandha
 
 ## Overview
 

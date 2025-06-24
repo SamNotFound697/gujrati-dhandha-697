@@ -224,7 +224,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="text-xl font-bold mb-4" style={{ color: 'var(--accent)' }}>
-                🏪 MarketPlace Pro
+                🏪 Gujrati Dhandha
               </div>
               <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                 Your ultimate destination for online shopping with millions of products from trusted sellers worldwide.
@@ -242,7 +242,7 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>For Sellers</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-accent theme-transition" style={{ color: 'var(--text-secondary)' }}>Sell on MarketPlace</a></li>
+                <li><a href="#" className="hover:text-accent theme-transition" style={{ color: 'var(--text-secondary)' }}>Sell on Gujrati Dhandha</a></li>
                 <li><a href="#" className="hover:text-accent theme-transition" style={{ color: 'var(--text-secondary)' }}>Seller Dashboard</a></li>
                 <li><a href="#" className="hover:text-accent theme-transition" style={{ color: 'var(--text-secondary)' }}>Seller Support</a></li>
                 <li><a href="#" className="hover:text-accent theme-transition" style={{ color: 'var(--text-secondary)' }}>Fees & Pricing</a></li>
@@ -261,7 +261,7 @@ export default function Home() {
           </div>
           <div className="border-t mt-8 pt-8 text-center" style={{ borderColor: 'var(--bg-primary)' }}>
             <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              © 2024 MarketPlace Pro. All rights reserved. | Privacy Policy | Terms of Service
+              © 2024 Gujrati Dhandha. All rights reserved. | Privacy Policy | Terms of Service
             </p>
           </div>
         </div>
