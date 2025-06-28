@@ -16,6 +16,7 @@ import {
   sanitizeInput
 } from "./auth";
 import { errorHandler, validateBody, corsOptions } from "./middleware";
+import { commissionProcessor } from "./commission";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -112,7 +113,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Product routes with proper authorization
+  // Commission payment endpoint
+  app.post("/api/payments/process-order", requireAuth, async (req, res, next) => {
+    try {
+      const { orderId, sellerId, totalAmount, paymentMethodId } = req.body;
+      
+      const commissionPayment = await commissionProcessor.processOrderPayment(
+        orderId,
+        sellerId,
+        totalAmount,
+        paymentMethodId
+      );
+      
+      res.json(commissionPayment);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Platform revenue endpoint
+  app.get("/api/admin/revenue", requireAuth, async (req, res, next) => {
+    try {
+      // Only allow admin access (you can add admin role check here)
+      const revenue = {
+        totalCommissions: 0, // Calculate from database
+        adRevenue: 0, // Track from ad networks
+        totalOrders: 0,
+        activeSellers: 0,
+        monthlyGrowth: 0,
+      };
+      
+      res.json(revenue);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Product routes with commission tracking
   app.get("/api/products", async (req, res, next) => {
     try {
       const { category, priceMin, priceMax, rating, search } = req.query;
@@ -318,7 +355,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Order routes with proper authorization
+  // Order routes with commission processing
   app.get("/api/orders/:userId", requireAuth, async (req, res, next) => {
     try {
       const userId = parseInt(req.params.userId);
@@ -348,6 +385,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       const order = await storage.createOrder(orderData);
+      
+      // Process commission payment
+      if (req.body.sellerId && req.body.paymentMethodId) {
+        await commissionProcessor.processOrderPayment(
+          order.id,
+          req.body.sellerId,
+          parseFloat(order.total),
+          req.body.paymentMethodId
+        );
+      }
+      
       res.json(order);
     } catch (error) {
       next(error);

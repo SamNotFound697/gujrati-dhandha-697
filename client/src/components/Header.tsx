@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "wouter";
-import { Search, ShoppingCart, User, Palette, Coffee, UserCheck, Store } from "lucide-react";
+import { Search, ShoppingCart, User, Palette, Coffee, UserCheck, Store, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -14,6 +14,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/hooks/use-cart";
 import { getStoredInterface, setStoredInterface } from "@/lib/auth";
 import { AuthModal } from "./AuthModal";
+import { AdBanner } from "./AdBanner";
 
 interface HeaderProps {
   onSearch?: (query: string) => void;
@@ -173,6 +174,14 @@ export function Header({ onSearch, onShowDonation }: HeaderProps) {
                         </Link>
                       </DropdownMenuItem>
                     )}
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin">
+                        <span style={{ color: 'var(--text-primary)' }}>
+                          <DollarSign className="h-4 w-4 mr-2 inline" />
+                          Revenue Dashboard
+                        </span>
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={logout}>
                       <span style={{ color: 'var(--text-primary)' }}>🚪 Logout</span>
                     </DropdownMenuItem>
@@ -248,6 +257,13 @@ export function Header({ onSearch, onShowDonation }: HeaderProps) {
               </Button>
             </div>
           </nav>
+        </div>
+
+        {/* Ad Banner */}
+        <div className="border-t" style={{ borderColor: 'var(--bg-secondary)' }}>
+          <div className="container mx-auto px-4 py-2 flex justify-center">
+            <AdBanner placement="header" />
+          </div>
         </div>
       </header>
 

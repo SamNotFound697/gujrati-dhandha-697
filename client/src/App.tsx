@@ -10,6 +10,7 @@ import ProductDetail from "@/pages/ProductDetail";
 import AboutMe from "@/pages/AboutMe";
 import Account from "@/pages/Account";
 import Cart from "@/pages/Cart";
+import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/about" component={AboutMe} />
       <Route path="/account" component={Account} />
       <Route path="/cart" component={Cart} />
+      <Route path="/admin" component={AdminDashboard} />
       <Route component={NotFound} />
     </Switch>
   );
