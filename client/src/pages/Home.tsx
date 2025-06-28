@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { ProductCard } from "@/components/ProductCard";
 import { Header } from "@/components/Header";
 import type { Product } from "@shared/schema";
@@ -78,6 +79,19 @@ export default function Home() {
       />
 
       <main className="container mx-auto px-4 py-8">
+        {/* Demo Products Notice */}
+        <div className="mb-6 p-4 bg-yellow-100 dark:bg-yellow-900 border border-yellow-300 dark:border-yellow-700 rounded-lg">
+          <div className="flex items-center space-x-2">
+            <Badge variant="secondary" className="bg-yellow-500 text-white">
+              DEMO
+            </Badge>
+            <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
+              <strong>Notice:</strong> The products shown below are demo/showcase items for demonstration purposes. 
+              Real sellers can add their own products through the seller dashboard.
+            </p>
+          </div>
+        </div>
+
         {/* Hero Banner */}
         <section className="mb-8">
           <div 
@@ -250,12 +264,31 @@ export default function Home() {
             </div>
             <div>
               <h4 className="font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Connect</h4>
-              <div className="flex space-x-4">
-                {['📘', '🐦', '📷', '💼'].map((icon, i) => (
-                  <a key={i} href="#" className="text-xl hover:text-accent theme-transition" style={{ color: 'var(--text-secondary)' }}>
-                    {icon}
-                  </a>
-                ))}
+              <div className="space-y-2">
+                <a href="https://github.com/SamNotFound697" target="_blank" rel="noopener noreferrer" 
+                   className="flex items-center space-x-2 text-sm hover:text-accent theme-transition" 
+                   style={{ color: 'var(--text-secondary)' }}>
+                  <span>🐙</span>
+                  <span>GitHub</span>
+                </a>
+                <a href="https://x.com/XXSamnotfoundXX" target="_blank" rel="noopener noreferrer"
+                   className="flex items-center space-x-2 text-sm hover:text-accent theme-transition" 
+                   style={{ color: 'var(--text-secondary)' }}>
+                  <span>🐦</span>
+                  <span>X (Twitter)</span>
+                </a>
+                <a href="https://www.instagram.com/stoic_sam_697/" target="_blank" rel="noopener noreferrer"
+                   className="flex items-center space-x-2 text-sm hover:text-accent theme-transition" 
+                   style={{ color: 'var(--text-secondary)' }}>
+                  <span>📷</span>
+                  <span>Instagram</span>
+                </a>
+                <a href="https://open.spotify.com/user/31txpubrgnlu2tdvkeyt3ia6npge" target="_blank" rel="noopener noreferrer"
+                   className="flex items-center space-x-2 text-sm hover:text-accent theme-transition" 
+                   style={{ color: 'var(--text-secondary)' }}>
+                  <span>🎵</span>
+                  <span>Spotify</span>
+                </a>
               </div>
             </div>
           </div>
@@ -267,7 +300,7 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Donation Modal - TODO: Implement */}
+      {/* Donation Modal */}
       {showDonationModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <Card className="max-w-md w-full theme-transition" style={{ backgroundColor: 'var(--bg-secondary)' }}>

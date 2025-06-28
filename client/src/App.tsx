@@ -7,6 +7,9 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import Home from "@/pages/Home";
 import SellerDashboard from "@/pages/SellerDashboard";
 import ProductDetail from "@/pages/ProductDetail";
+import AboutMe from "@/pages/AboutMe";
+import Account from "@/pages/Account";
+import Cart from "@/pages/Cart";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -15,6 +18,9 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/seller/dashboard" component={SellerDashboard} />
       <Route path="/product/:id" component={ProductDetail} />
+      <Route path="/about" component={AboutMe} />
+      <Route path="/account" component={Account} />
+      <Route path="/cart" component={Cart} />
       <Route component={NotFound} />
     </Switch>
   );

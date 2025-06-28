@@ -93,12 +93,19 @@ export function Header({ onSearch, onShowDonation }: HeaderProps) {
 
             {/* Right Menu */}
             <div className="flex items-center space-x-6">
-              {/* Theme Switcher */}
+              {/* Amazon Partner Badge */}
+              <div className="hidden md:flex items-center space-x-2 px-3 py-1 bg-orange-100 dark:bg-orange-900 rounded-full">
+                <span className="text-xs font-medium text-orange-800 dark:text-orange-200">
+                  🤝 Amazon Partner
+                </span>
+              </div>
+
+              {/* Vibe Switcher */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="flex items-center space-x-2 theme-transition">
                     <Palette className="h-4 w-4" />
-                    <span className="hidden md:inline">Theme</span>
+                    <span className="hidden md:inline">Vibe</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent style={{ backgroundColor: 'var(--bg-secondary)' }}>
@@ -145,13 +152,13 @@ export function Header({ onSearch, onShowDonation }: HeaderProps) {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="flex items-center space-x-2 theme-transition">
                       <User className="h-4 w-4" />
-                      <span className="hidden md:inline">{user?.fullName}</span>
+                      <span className="hidden md:inline">{user?.fullName || user?.username}</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent style={{ backgroundColor: 'var(--bg-secondary)' }}>
                     <DropdownMenuItem asChild>
-                      <Link href="/profile">
-                        <span style={{ color: 'var(--text-primary)' }}>👤 Profile</span>
+                      <Link href="/account">
+                        <span style={{ color: 'var(--text-primary)' }}>👤 Account</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -223,7 +230,7 @@ export function Header({ onSearch, onShowDonation }: HeaderProps) {
               </Link>
               <div className="category-divider"></div>
               <Link href="/about" className="text-sm hover:text-accent theme-transition">
-                About Us
+                About Me
               </Link>
               <div className="category-divider"></div>
               <Link href="/contact" className="text-sm hover:text-accent theme-transition">

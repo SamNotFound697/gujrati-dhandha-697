@@ -6,6 +6,7 @@ import type { Product } from "@shared/schema";
 import { useCart } from "@/hooks/use-cart";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
+import { AffiliateTracker } from "./AffiliateTracker";
 
 interface ProductCardProps {
   product: Product;
@@ -51,17 +52,26 @@ export function ProductCard({ product }: ProductCardProps) {
     );
   };
 
+  // Check if this is a demo product (from seeded data)
+  const isDemoProduct = product.id <= 4; // First 4 products are demo
+  const amazonUrl = isDemoProduct ? `https://amazon.com/dp/DEMO${product.id}?tag=gujratidhandha-20` : undefined;
+
   return (
     <Card className="rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow theme-transition"
           style={{ backgroundColor: 'var(--bg-secondary)' }}>
       <Link href={`/product/${product.id}`}>
-        <div className="cursor-pointer">
+        <div className="cursor-pointer relative">
           {product.images && product.images.length > 0 && (
             <img
               src={product.images[0]}
               alt={product.name}
               className="w-full h-48 object-cover"
             />
+          )}
+          {isDemoProduct && (
+            <Badge className="absolute top-2 left-2 bg-yellow-500 text-white">
+              DEMO
+            </Badge>
           )}
         </div>
       </Link>
@@ -102,22 +112,33 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
         
-        <Button
-          onClick={handleAddToCart}
-          disabled={isAddingToCart || product.stock === 0}
-          className="w-full bg-accent hover:bg-orange-600 text-white transition-colors"
-        >
-          {isAddingToCart ? (
-            "Adding..."
-          ) : product.stock === 0 ? (
-            "Out of Stock"
-          ) : (
-            <>
-              <ShoppingCart className="h-4 w-4 mr-2" />
-              Add to Cart
-            </>
+        <div className="space-y-2">
+          <Button
+            onClick={handleAddToCart}
+            disabled={isAddingToCart || product.stock === 0}
+            className="w-full bg-accent hover:bg-orange-600 text-white transition-colors"
+          >
+            {isAddingToCart ? (
+              "Adding..."
+            ) : product.stock === 0 ? (
+              "Out of Stock"
+            ) : (
+              <>
+                <ShoppingCart className="h-4 w-4 mr-2" />
+                Add to Cart
+              </>
+            )}
+          </Button>
+          
+          {isDemoProduct && amazonUrl && (
+            <AffiliateTracker
+              productId={product.id}
+              productName={product.name}
+              productPrice={parseFloat(product.price)}
+              amazonUrl={amazonUrl}
+            />
           )}
-        </Button>
+        </div>
       </CardContent>
     </Card>
   );

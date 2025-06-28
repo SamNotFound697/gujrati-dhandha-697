@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Header } from "@/components/Header";
+import { AffiliateTracker } from "@/components/AffiliateTracker";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -203,6 +204,11 @@ export default function SellerDashboard() {
               </p>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Affiliate Analytics */}
+        <div className="mb-8">
+          <AffiliateTracker />
         </div>
 
         {/* Products Section */}
