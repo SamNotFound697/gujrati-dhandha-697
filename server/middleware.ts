@@ -57,7 +57,7 @@ export function requireOwnership(resourceType: 'product' | 'order' | 'cart') {
 // CORS configuration
 export const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://yourdomain.com'] // Replace with your actual domain
+    ? process.env.ALLOWED_ORIGINS?.split(',') || ['https://yourdomain.com']
     : ['http://localhost:5000', 'http://localhost:3000'],
   credentials: true,
   optionsSuccessStatus: 200,

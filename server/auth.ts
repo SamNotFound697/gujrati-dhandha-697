@@ -18,7 +18,7 @@ export const registerSchema = z.object({
   password: z.string().min(8).max(128)
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, 
            'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
-  fullName: z.string().min(1).max(100),
+  fullName: z.string().min(1).max(100).regex(/^[a-zA-Z\s]+$/, 'Full name can only contain letters and spaces'),
   isSeller: z.boolean().optional(),
 });
 
@@ -49,7 +49,7 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 
 // Session configuration
 export const sessionConfig = {
-  secret: process.env.SESSION_SECRET || 'your-super-secret-key-change-this-in-production',
+  secret: process.env.SESSION_SECRET || 'your-super-secret-key-change-this-in-production-minimum-32-characters',
   resave: false,
   saveUninitialized: false,
   cookie: {

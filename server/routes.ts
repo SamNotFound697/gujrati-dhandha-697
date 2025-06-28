@@ -25,6 +25,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(cors(corsOptions));
   app.use(session(sessionConfig));
   
+  // Session validation endpoint
+  app.get("/api/auth/validate", (req, res) => {
+    if ((req as any).session?.userId) {
+      // In a real app, you'd fetch user data from database
+      res.json({ 
+        user: { 
+          id: (req as any).session.userId,
+          isSeller: (req as any).session.isSeller || false
+        } 
+      });
+    } else {
+      res.status(401).json({ message: "Not authenticated" });
+    }
+  });
+  
   // Auth routes
   app.post("/api/auth/register", validateBody(registerSchema), async (req, res, next) => {
     try {
@@ -36,6 +51,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "User already exists" });
       }
       
+      // Check username uniqueness
+      const existingUsername = await storage.getUserByUsername(userData.username);
+      if (existingUsername) {
+        return res.status(400).json({ message: "Username already taken" });
+      }
+      
       // Hash password
       const hashedPassword = await hashPassword(userData.password);
       
@@ -44,6 +65,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         password: hashedPassword,
         fullName: sanitizeInput(userData.fullName),
         username: sanitizeInput(userData.username),
+        email: sanitizeInput(userData.email),
       });
       
       // Set session
@@ -60,7 +82,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password } = req.body;
       
-      const user = await storage.getUserByEmail(email);
+      const user = await storage.getUserByEmail(sanitizeInput(email));
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
@@ -90,7 +112,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Product routes
+  // Product routes with proper authorization
   app.get("/api/products", async (req, res, next) => {
     try {
       const { category, priceMin, priceMax, rating, search } = req.query;
@@ -213,7 +235,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Cart routes
+  // Cart routes with proper authorization
   app.get("/api/cart/:userId", requireAuth, async (req, res, next) => {
     try {
       const userId = parseInt(req.params.userId);
@@ -247,8 +269,145 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Add similar security fixes for other routes...
-  // (cart update/delete, orders, reviews, donations)
+  app.put("/api/cart/:id", requireAuth, async (req, res, next) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid cart item ID" });
+      }
+      
+      const { quantity } = req.body;
+      if (!quantity || quantity < 1) {
+        return res.status(400).json({ message: "Invalid quantity" });
+      }
+      
+      // Verify ownership
+      const cartItems = await storage.getCartItems((req as any).session.userId);
+      const cartItem = cartItems.find(item => item.id === id);
+      
+      if (!cartItem) {
+        return res.status(404).json({ message: "Cart item not found" });
+      }
+      
+      const updatedItem = await storage.updateCartItem(id, quantity);
+      res.json(updatedItem);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.delete("/api/cart/:id", requireAuth, async (req, res, next) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid cart item ID" });
+      }
+      
+      // Verify ownership
+      const cartItems = await storage.getCartItems((req as any).session.userId);
+      const cartItem = cartItems.find(item => item.id === id);
+      
+      if (!cartItem) {
+        return res.status(404).json({ message: "Cart item not found" });
+      }
+      
+      const deleted = await storage.removeFromCart(id);
+      res.json({ message: "Cart item removed successfully" });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Order routes with proper authorization
+  app.get("/api/orders/:userId", requireAuth, async (req, res, next) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      
+      // Users can only access their own orders
+      if (userId !== (req as any).session.userId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const orders = await storage.getOrders(userId);
+      res.json(orders);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/api/orders", requireAuth, validateBody(insertOrderSchema), async (req, res, next) => {
+    try {
+      const orderData = {
+        ...req.body,
+        userId: (req as any).session.userId, // Force user ID from session
+        shippingAddress: sanitizeInput(req.body.shippingAddress),
+        paymentMethod: sanitizeInput(req.body.paymentMethod),
+      };
+      
+      const order = await storage.createOrder(orderData);
+      res.json(order);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Review routes with proper authorization
+  app.get("/api/reviews/:productId", async (req, res, next) => {
+    try {
+      const productId = parseInt(req.params.productId);
+      if (isNaN(productId)) {
+        return res.status(400).json({ message: "Invalid product ID" });
+      }
+      
+      const reviews = await storage.getReviews(productId);
+      res.json(reviews);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/api/reviews", requireAuth, validateBody(insertReviewSchema), async (req, res, next) => {
+    try {
+      const reviewData = {
+        ...req.body,
+        userId: (req as any).session.userId, // Force user ID from session
+        comment: req.body.comment ? sanitizeInput(req.body.comment) : undefined,
+      };
+      
+      const review = await storage.createReview(reviewData);
+      res.json(review);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Donation routes
+  app.get("/api/donations", async (req, res, next) => {
+    try {
+      const donations = await storage.getDonations();
+      res.json(donations);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/api/donations", validateBody(insertDonationSchema), async (req, res, next) => {
+    try {
+      const donationData = {
+        ...req.body,
+        donorName: req.body.donorName ? sanitizeInput(req.body.donorName) : undefined,
+        message: req.body.message ? sanitizeInput(req.body.message) : undefined,
+      };
+      
+      const donation = await storage.createDonation(donationData);
+      res.json(donation);
+    } catch (error) {
+      next(error);
+    }
+  });
 
   // Error handling middleware (must be last)
   app.use(errorHandler);
