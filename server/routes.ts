@@ -1,12 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
+import MemoryStore from "memorystore";
 import cors from "cors";
 import { storage } from "./storage";
 import { insertUserSchema, insertProductSchema, insertCartItemSchema, insertOrderSchema, insertReviewSchema, insertDonationSchema } from "@shared/schema";
 import { 
   setupSecurity, 
-  sessionConfig, 
   requireAuth, 
   requireSeller,
   hashPassword,
@@ -17,22 +17,44 @@ import {
 } from "./auth";
 import { errorHandler, validateBody, corsOptions } from "./middleware";
 import { commissionProcessor } from "./commission";
+import { advertisingManager } from "./advertising";
 import { z } from "zod";
+
+// Use MemoryStore for development
+const MemStore = MemoryStore(session);
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
   // Security setup
   setupSecurity(app);
   app.use(cors(corsOptions));
-  app.use(session(sessionConfig));
+  
+  // Session configuration for development
+  app.use(session({
+    secret: process.env.SESSION_SECRET || 'dev-secret-key-change-in-production',
+    resave: false,
+    saveUninitialized: false,
+    store: new MemStore({
+      checkPeriod: 86400000 // prune expired entries every 24h
+    }),
+    cookie: {
+      secure: false, // Set to true in production with HTTPS
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: 'lax'
+    },
+    name: 'gd_session',
+  }));
   
   // Session validation endpoint
   app.get("/api/auth/validate", (req, res) => {
     if ((req as any).session?.userId) {
-      // In a real app, you'd fetch user data from database
       res.json({ 
         user: { 
           id: (req as any).session.userId,
+          username: (req as any).session.username,
+          fullName: (req as any).session.fullName,
+          email: (req as any).session.email,
           isSeller: (req as any).session.isSeller || false
         } 
       });
@@ -71,6 +93,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Set session
       (req as any).session.userId = user.id;
+      (req as any).session.username = user.username;
+      (req as any).session.fullName = user.fullName;
+      (req as any).session.email = user.email;
       (req as any).session.isSeller = user.isSeller;
       
       res.json({ user: { ...user, password: undefined } });
@@ -95,6 +120,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Set session
       (req as any).session.userId = user.id;
+      (req as any).session.username = user.username;
+      (req as any).session.fullName = user.fullName;
+      (req as any).session.email = user.email;
       (req as any).session.isSeller = user.isSeller;
       
       res.json({ user: { ...user, password: undefined } });
@@ -108,7 +136,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (err) {
         return res.status(500).json({ message: "Could not log out" });
       }
-      res.clearCookie('sessionId');
+      res.clearCookie('gd_session');
       res.json({ message: "Logged out successfully" });
     });
   });
@@ -134,7 +162,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Platform revenue endpoint
   app.get("/api/admin/revenue", requireAuth, async (req, res, next) => {
     try {
-      // Only allow admin access (you can add admin role check here)
       const revenue = {
         totalCommissions: 0, // Calculate from database
         adRevenue: 0, // Track from ad networks
